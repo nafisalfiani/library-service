@@ -1,27 +1,4 @@
 definitions:
-  entity.DepositHistory:
-    properties:
-      amount:
-        type: number
-      id:
-        type: integer
-      payment_method:
-        type: string
-      type:
-        type: string
-      user_id:
-        type: integer
-    type: object
-  entity.DepositRequest:
-    properties:
-      amount:
-        type: number
-      payment_method:
-        type: string
-    required:
-    - amount
-    - payment_method
-    type: object
   entity.HttpResp:
     properties:
       data: {}
@@ -57,12 +34,17 @@ definitions:
         type: string
       payment_method:
         type: string
-      rental:
-        items:
-          $ref: '#/definitions/entity.Rental'
-        type: array
+      status:
+        type: string
+      type:
+        type: string
       user_id:
         type: integer
+    type: object
+  entity.PaymentRequest:
+    properties:
+      amount:
+        type: number
     type: object
   entity.RegisterRequest:
     properties:
@@ -90,6 +72,8 @@ definitions:
     properties:
       id:
         type: integer
+      payment:
+        $ref: '#/definitions/entity.Payment'
       payment_id:
         type: integer
       rental_date:
@@ -118,10 +102,6 @@ definitions:
     properties:
       deposit_amount:
         type: number
-      deposit_histories:
-        items:
-          $ref: '#/definitions/entity.DepositHistory'
-        type: array
       email:
         type: string
       full_name:
@@ -141,6 +121,13 @@ definitions:
       username:
         type: string
     type: object
+  entity.XenditCheckPayment:
+    properties:
+      payment_id:
+        type: string
+      xendit_payment_id:
+        type: string
+    type: object
 info:
   contact:
     email: nafisa.alfiani.ica@gmail.com
@@ -157,7 +144,7 @@ paths:
         name: deposit
         required: true
         schema:
-          $ref: '#/definitions/entity.DepositRequest'
+          $ref: '#/definitions/entity.PaymentRequest'
       produces:
       - application/json
       responses:
@@ -178,11 +165,18 @@ paths:
       summary: Top up user deposit
       tags:
       - deposits
-  /deposits/history:
-    get:
+  /payments:
+    post:
       consumes:
       - application/json
-      description: Get logged in user deposit history
+      description: Check and refresh payment status if applicable
+      parameters:
+      - description: payment request
+        in: body
+        name: payment
+        required: true
+        schema:
+          $ref: '#/definitions/entity.XenditCheckPayment'
       produces:
       - application/json
       responses:
@@ -200,32 +194,7 @@ paths:
             $ref: '#/definitions/entity.HttpResp'
       security:
       - BearerAuth: []
-      summary: Get deposit history
-      tags:
-      - deposits
-  /payments/methods:
-    get:
-      consumes:
-      - application/json
-      description: Lists available payment methods
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.HttpResp'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/entity.HttpResp'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/entity.HttpResp'
-      security:
-      - BearerAuth: []
-      summary: List payment methods
+      summary: Refresh payment status
       tags:
       - payments
   /users:

@@ -1,36 +1,56 @@
 package entity
 
-import "strings"
-
-const (
-	PaymentMethodEwallet        = "EWALLET"
-	PaymentMethodDirectDebit    = "DIRECT_DEBIT"
-	PaymentMethodCard           = "CARD"
-	PaymentMethodVirtualAccount = "VIRTUAL_ACCOUNT"
-	PaymentMethodOverTheCounter = "OVER_THE_COUNTER"
-	PaymentMethodQrCode         = "QR_CODE"
-	PaymentMethodInvalid        = "INVALID"
+import (
+	"strconv"
+	"strings"
+	"time"
 )
 
-type XenditPayment struct {
-	PaymentMethod string
+var (
+	IdrCurrency = "IDR"
+)
+
+const (
+	InvoiceStatusPending = "PENDING"
+	InvoiceStatusPaid    = "PAID"
+)
+
+type XenditPaymentRequest struct {
+	PaymentId          string
+	Amount             float64
+	PaymentMethod      string
+	Currency           *string
+	InvoiceDescription *string
+	InvoiceExpiry      *string
+	InvoiceName        *string
+	InvoiceEmail       *string
+	Items              []PaymentItems
 }
 
-func (x XenditPayment) GetPaymentMethod() string {
-	switch strings.ToLower(x.PaymentMethod) {
-	case strings.ToLower(PaymentMethodEwallet):
-		return PaymentMethodEwallet
-	case strings.ToLower(PaymentMethodDirectDebit):
-		return PaymentMethodDirectDebit
-	case strings.ToLower(PaymentMethodCard):
-		return PaymentMethodCard
-	case strings.ToLower(PaymentMethodVirtualAccount):
-		return PaymentMethodVirtualAccount
-	case strings.ToLower(PaymentMethodOverTheCounter):
-		return PaymentMethodOverTheCounter
-	case strings.ToLower(PaymentMethodQrCode):
-		return PaymentMethodQrCode
-	}
+type PaymentItems struct {
+	Name     string
+	Price    float32
+	Quantity float32
+}
 
-	return PaymentMethodInvalid
+type XenditPaymentResponse struct {
+	XenditPaymentId   string    `json:"xendit_payment_id"`
+	PaymentId         string    `json:"payment_id"`
+	InvoiceExpiryDate time.Time `json:"expiry_date"`
+	InvoiceStatus     string    `json:"status"`
+	InvoiceAmount     float64   `json:"amount"`
+	InvoiceUrl        string    `json:"url"`
+	PaymentMethod     string    `json:"payment_method""`
+}
+
+type XenditCheckPayment struct {
+	XenditPaymentId string `json:"xendit_payment_id"`
+	PaymentId       string `json:"payment_id"`
+}
+
+func (x *XenditPaymentResponse) GetPaymentId() (paymentType string, paymentId int, err error) {
+	res := strings.Split(x.PaymentId, ":")
+	paymentType = res[1]
+	paymentId, err = strconv.Atoi(res[2])
+	return
 }

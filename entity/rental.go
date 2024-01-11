@@ -7,6 +7,7 @@ type Rental struct {
 	UserId        int            `json:"user_id" gorm:"foreignKey"`
 	PaymentId     int            `json:"payment_id" gorm:"foreignKey"`
 	RentalDate    time.Time      `json:"rental_date" gorm:"default:CURRENT_TIMESTAMP"`
+	Payment       *Payment       `json:"payment" gorm:"foreignKey:PaymentId"`
 	RentalDetails []RentalDetail `json:"rental_details,omitempty" gorm:"foreignKey:RentalId"`
 }
 

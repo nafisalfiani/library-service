@@ -44,7 +44,6 @@ func main() {
 	// auto migrate DB changes
 	if err := db.AutoMigrate(
 		&entity.User{},
-		&entity.DepositHistory{},
 		&entity.Category{},
 		&entity.Book{},
 		&entity.Rental{},
@@ -57,6 +56,7 @@ func main() {
 	// init validator
 	validator := validator.New(validator.WithRequiredStructEnabled())
 
+	// init xendit
 	xnd := xendit.NewClient(cfg.Xendit.ApiKey)
 
 	// init repository
@@ -82,16 +82,14 @@ func main() {
 	users.GET("", handler.GetUser, handler.Authorize)
 
 	deposits := e.Group("/deposits", handler.Authorize)
-	deposits.POST("", handler.CreateDeposit)
-	deposits.GET("/history", handler.GetDepositHistory)
+	deposits.POST("", handler.TopUpDeposit)
 
 	rentals := e.Group("/rentals", handler.Authorize)
 	rentals.GET("", handler.GetOutstandingRental)
 	rentals.GET("/history", handler.GetRentalHistory)
 	rentals.POST("", handler.CreateRental)
 
-	payments := e.Group("/payments", handler.Authorize)
-	payments.GET("/methods", handler.ListPaymentMethods)
+	e.POST("/payments", handler.RefreshPaymentStatus)
 
 	books := e.Group("/books", handler.Authorize)
 	books.GET("", handler.ListBook)

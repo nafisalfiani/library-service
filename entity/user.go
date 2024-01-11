@@ -1,16 +1,15 @@
 package entity
 
 type User struct {
-	Id               int              `json:"id" gorm:"primaryKey"`
-	Email            string           `json:"email" gorm:"not null;unique"`
-	Username         string           `json:"username" gorm:"not null;unique"`
-	FullName         string           `json:"full_name" gorm:"not null"`
-	Password         string           `json:"-" gorm:"not null"`
-	DepositAmount    float64          `json:"deposit_amount" gorm:"default:0"`
-	Role             string           `json:"role" gorm:"not null"`
-	DepositHistories []DepositHistory `json:"deposit_histories,omitempty" gorm:"foreignKey:UserId"`
-	Payment          []Payment        `json:"payments,omitempty" gorm:"foreignKey:UserId"`
-	Rental           []Rental         `json:"rentals,omitempty" gorm:"foreignKey:UserId"`
+	Id            int       `json:"id" gorm:"primaryKey"`
+	Email         string    `json:"email" gorm:"not null;unique"`
+	Username      string    `json:"username" gorm:"not null;unique"`
+	FullName      string    `json:"full_name" gorm:"not null"`
+	Password      string    `json:"-" gorm:"not null"`
+	DepositAmount float64   `json:"deposit_amount" gorm:"default:0"`
+	Role          string    `json:"role" gorm:"not null"`
+	Payment       []Payment `json:"payments,omitempty" gorm:"foreignKey:UserId"`
+	Rental        []Rental  `json:"rentals,omitempty" gorm:"foreignKey:UserId"`
 }
 
 type RegisterRequest struct {

@@ -43,7 +43,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.DepositRequest"
+                            "$ref": "#/definitions/entity.PaymentRequest"
                         }
                     }
                 ],
@@ -69,54 +69,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/deposits/history": {
-            "get": {
+        "/payments": {
+            "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get logged in user deposit history",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "deposits"
-                ],
-                "summary": "Get deposit history",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/entity.HttpResp"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/entity.HttpResp"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/entity.HttpResp"
-                        }
-                    }
-                }
-            }
-        },
-        "/payments/methods": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Lists available payment methods",
+                "description": "Check and refresh payment status if applicable",
                 "consumes": [
                     "application/json"
                 ],
@@ -126,7 +86,18 @@ const docTemplate = `{
                 "tags": [
                     "payments"
                 ],
-                "summary": "List payment methods",
+                "summary": "Refresh payment status",
+                "parameters": [
+                    {
+                        "description": "payment request",
+                        "name": "payment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.XenditCheckPayment"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -319,41 +290,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "entity.DepositHistory": {
-            "type": "object",
-            "properties": {
-                "amount": {
-                    "type": "number"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "payment_method": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "entity.DepositRequest": {
-            "type": "object",
-            "required": [
-                "amount",
-                "payment_method"
-            ],
-            "properties": {
-                "amount": {
-                    "type": "number"
-                },
-                "payment_method": {
-                    "type": "string"
-                }
-            }
-        },
         "entity.HttpResp": {
             "type": "object",
             "properties": {
@@ -407,14 +343,22 @@ const docTemplate = `{
                 "payment_method": {
                     "type": "string"
                 },
-                "rental": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Rental"
-                    }
+                "status": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
                 },
                 "user_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "entity.PaymentRequest": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
                 }
             }
         },
@@ -454,6 +398,9 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "integer"
+                },
+                "payment": {
+                    "$ref": "#/definitions/entity.Payment"
                 },
                 "payment_id": {
                     "type": "integer"
@@ -498,12 +445,6 @@ const docTemplate = `{
                 "deposit_amount": {
                     "type": "number"
                 },
-                "deposit_histories": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.DepositHistory"
-                    }
-                },
                 "email": {
                     "type": "string"
                 },
@@ -529,6 +470,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.XenditCheckPayment": {
+            "type": "object",
+            "properties": {
+                "payment_id": {
+                    "type": "string"
+                },
+                "xendit_payment_id": {
                     "type": "string"
                 }
             }

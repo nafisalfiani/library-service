@@ -26,7 +26,6 @@ type Handler struct {
 	user      repository.UserInterface
 	book      repository.BookInterface
 	category  repository.CategoryInterface
-	deposit   repository.DepositInterface
 	payment   repository.PaymentInterface
 	rental    repository.RentalInterface
 	xendit    repository.XenditInterface
@@ -41,7 +40,6 @@ func Init(config *config.Value, repo *repository.Repository, validator *validato
 		user:      repo.User,
 		book:      repo.Book,
 		category:  repo.Category,
-		deposit:   repo.Deposit,
 		payment:   repo.Payment,
 		rental:    repo.Rental,
 		xendit:    repo.Xendit,

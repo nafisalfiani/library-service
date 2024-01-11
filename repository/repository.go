@@ -11,7 +11,6 @@ type Repository struct {
 	User     UserInterface
 	Book     BookInterface
 	Category CategoryInterface
-	Deposit  DepositInterface
 	Rental   RentalInterface
 	Payment  PaymentInterface
 	Xendit   XenditInterface
@@ -22,7 +21,6 @@ func InitRepository(db *gorm.DB, xnd *xendit.APIClient) *Repository {
 		User:     initUser(db),
 		Book:     initBook(db),
 		Category: initCategory(db),
-		Deposit:  initDeposit(db),
 		Rental:   initRental(db),
 		Payment:  initPayment(db),
 		Xendit:   initXendit(xnd),
