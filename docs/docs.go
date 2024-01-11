@@ -18,6 +18,153 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/books": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete specific books",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "books"
+                ],
+                "summary": "Delete book",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "book id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates new books",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "books"
+                ],
+                "summary": "Create books",
+                "parameters": [
+                    {
+                        "description": "book request",
+                        "name": "book",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.BookRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/books/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "returns specific books",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "books"
+                ],
+                "summary": "Get specific books",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "book id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    }
+                }
+            }
+        },
         "/deposits": {
             "post": {
                 "security": [
@@ -70,6 +217,44 @@ const docTemplate = `{
             }
         },
         "/payments": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "List of payment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "payments"
+                ],
+                "summary": "List of payment",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -103,6 +288,179 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/rental": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get active rental of logged in user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rentals"
+                ],
+                "summary": "Create a rental",
+                "parameters": [
+                    {
+                        "description": "rental request",
+                        "name": "rental",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RentalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/entity.HttpResp"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/entity.Rental"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/rental/active": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get active rental of logged in user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rentals"
+                ],
+                "summary": "Get active rental",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/entity.HttpResp"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/entity.Rental"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HttpResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/rental/closed": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get closed rental of logged in user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rentals"
+                ],
+                "summary": "Get closed rental",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/entity.HttpResp"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/entity.Rental"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -290,6 +648,62 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "entity.Book": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "rental_cost": {
+                    "type": "number"
+                },
+                "rental_details": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.RentalDetail"
+                    }
+                },
+                "stock_availability": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.BookRequest": {
+            "type": "object",
+            "required": [
+                "category_name",
+                "description",
+                "name",
+                "rental_cost",
+                "stock_availability"
+            ],
+            "properties": {
+                "category_name": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "rental_cost": {
+                    "type": "number"
+                },
+                "stock_availability": {
+                    "type": "integer"
+                }
+            }
+        },
         "entity.HttpResp": {
             "type": "object",
             "properties": {
@@ -351,6 +765,12 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "integer"
+                },
+                "xendit_payment_id": {
+                    "type": "string"
+                },
+                "xendit_payment_url": {
+                    "type": "string"
                 }
             }
         },
@@ -414,6 +834,9 @@ const docTemplate = `{
                         "$ref": "#/definitions/entity.RentalDetail"
                     }
                 },
+                "status": {
+                    "type": "string"
+                },
                 "user_id": {
                     "type": "integer"
                 }
@@ -425,7 +848,16 @@ const docTemplate = `{
                 "book_id": {
                     "type": "integer"
                 },
+                "book_name": {
+                    "type": "string"
+                },
                 "id": {
+                    "type": "integer"
+                },
+                "rental_cost": {
+                    "type": "number"
+                },
+                "rental_duration": {
                     "type": "integer"
                 },
                 "rental_id": {
@@ -436,6 +868,39 @@ const docTemplate = `{
                 },
                 "returned": {
                     "type": "boolean"
+                }
+            }
+        },
+        "entity.RentalRequest": {
+            "type": "object",
+            "required": [
+                "books",
+                "payment_method"
+            ],
+            "properties": {
+                "books": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.RentalRequestDetail"
+                    }
+                },
+                "payment_method": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.RentalRequestDetail": {
+            "type": "object",
+            "required": [
+                "book_id",
+                "rental_duration"
+            ],
+            "properties": {
+                "book_id": {
+                    "type": "integer"
+                },
+                "rental_duration": {
+                    "type": "integer"
                 }
             }
         },

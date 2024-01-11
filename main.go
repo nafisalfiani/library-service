@@ -85,18 +85,20 @@ func main() {
 	deposits.POST("", handler.TopUpDeposit)
 
 	rentals := e.Group("/rentals", handler.Authorize)
-	rentals.GET("", handler.GetOutstandingRental)
-	rentals.GET("/history", handler.GetRentalHistory)
+	rentals.GET("/active", handler.GetActiveRental)
+	rentals.GET("/closed", handler.GetRentalHistory)
 	rentals.POST("", handler.CreateRental)
 
-	e.POST("/payments", handler.RefreshPaymentStatus)
+	payments := e.Group("/payments", handler.Authorize)
+	payments.GET("", handler.GetPayments)
+	payments.POST("", handler.RefreshPaymentStatus)
 
 	books := e.Group("/books", handler.Authorize)
 	books.GET("", handler.ListBook)
 	books.GET("/:id", handler.GetBook)
 	books.POST("", handler.CreateBook)
-	books.PUT("", handler.UpdateBook)
-	books.DELETE("", handler.DeleteBook)
+	books.PUT("/:id", handler.UpdateBook)
+	books.DELETE("/:id", handler.DeleteBook)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf("%v:%v", cfg.Server.Base, cfg.Server.Port)))
 }

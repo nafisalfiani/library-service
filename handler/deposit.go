@@ -42,9 +42,9 @@ func (h *Handler) TopUpDeposit(c echo.Context) error {
 	depositReq := entity.Payment{
 		UserId:        int(userId),
 		Amount:        req.Amount,
-		PaymentMethod: "UNDECIDED",
+		PaymentMethod: entity.PaymentMethodWaiting,
 		Status:        entity.InvoiceStatusPending,
-		Type:          "deposit-saldo",
+		Type:          entity.PaymentTypeDepositSaldo,
 	}
 	resp, err := h.createPayment(c.Request().Context(), depositReq, user)
 	if err != nil {
@@ -60,17 +60,15 @@ func (h *Handler) createPayment(ctx context.Context, req entity.Payment, user en
 		return entity.XenditPaymentResponse{}, err
 	}
 
-	desc := "Deposit Saldo"
-	exp := "86400"
 	paymentReq := entity.XenditPaymentRequest{
+		PaymentId:          fmt.Sprintf(":deposit-saldo:%v", payment.Id),
 		Amount:             req.Amount,
 		PaymentMethod:      req.PaymentMethod,
-		PaymentId:          fmt.Sprintf(":deposit-saldo:%v", payment.Id),
 		Currency:           &entity.IdrCurrency,
 		InvoiceName:        &user.FullName,
 		InvoiceEmail:       &user.Email,
-		InvoiceDescription: &desc,
-		InvoiceExpiry:      &exp,
+		InvoiceDescription: &entity.DescriptionDepositSaldo,
+		InvoiceExpiry:      &entity.InvoiceExpiry,
 		Items: []entity.PaymentItems{
 			{
 				Name:     "Deposit Saldo",

@@ -64,3 +64,26 @@ func (h *Handler) RefreshPaymentStatus(c echo.Context) error {
 
 	return h.httpSuccess(c, http.StatusCreated, resp)
 }
+
+// GetPayments returns list of payment
+//
+// @Summary List of payment
+// @Description List of payment
+// @Tags payments
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Success 200 {object} entity.HttpResp
+// @Failure 400 {object} entity.HttpResp
+// @Failure 500 {object} entity.HttpResp
+// @Router /payments [get]
+func (h *Handler) GetPayments(c echo.Context) error {
+	userId := c.Request().Context().Value(contextKeyUserId).(float64)
+
+	payments, err := h.payment.List(int(userId))
+	if err != nil {
+		return h.httpError(c, err)
+	}
+
+	return h.httpSuccess(c, http.StatusOK, payments)
+}

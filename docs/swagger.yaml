@@ -1,4 +1,42 @@
 definitions:
+  entity.Book:
+    properties:
+      category_id:
+        type: integer
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      rental_cost:
+        type: number
+      rental_details:
+        items:
+          $ref: '#/definitions/entity.RentalDetail'
+        type: array
+      stock_availability:
+        type: integer
+    type: object
+  entity.BookRequest:
+    properties:
+      category_name:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      rental_cost:
+        type: number
+      stock_availability:
+        type: integer
+    required:
+    - category_name
+    - description
+    - name
+    - rental_cost
+    - stock_availability
+    type: object
   entity.HttpResp:
     properties:
       data: {}
@@ -40,6 +78,10 @@ definitions:
         type: string
       user_id:
         type: integer
+      xendit_payment_id:
+        type: string
+      xendit_payment_url:
+        type: string
     type: object
   entity.PaymentRequest:
     properties:
@@ -82,6 +124,8 @@ definitions:
         items:
           $ref: '#/definitions/entity.RentalDetail'
         type: array
+      status:
+        type: string
       user_id:
         type: integer
     type: object
@@ -89,7 +133,13 @@ definitions:
     properties:
       book_id:
         type: integer
+      book_name:
+        type: string
       id:
+        type: integer
+      rental_cost:
+        type: number
+      rental_duration:
         type: integer
       rental_id:
         type: integer
@@ -97,6 +147,28 @@ definitions:
         type: string
       returned:
         type: boolean
+    type: object
+  entity.RentalRequest:
+    properties:
+      books:
+        items:
+          $ref: '#/definitions/entity.RentalRequestDetail'
+        type: array
+      payment_method:
+        type: string
+    required:
+    - books
+    - payment_method
+    type: object
+  entity.RentalRequestDetail:
+    properties:
+      book_id:
+        type: integer
+      rental_duration:
+        type: integer
+    required:
+    - book_id
+    - rental_duration
     type: object
   entity.User:
     properties:
@@ -133,6 +205,99 @@ info:
     email: nafisa.alfiani.ica@gmail.com
     name: Nafisa Alfiani
 paths:
+  /books:
+    get:
+      consumes:
+      - application/json
+      description: Delete specific books
+      parameters:
+      - description: book id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+      security:
+      - BearerAuth: []
+      summary: Delete book
+      tags:
+      - books
+    post:
+      consumes:
+      - application/json
+      description: Creates new books
+      parameters:
+      - description: book request
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/entity.BookRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+      security:
+      - BearerAuth: []
+      summary: Create books
+      tags:
+      - books
+  /books/{id}:
+    get:
+      consumes:
+      - application/json
+      description: returns specific books
+      parameters:
+      - description: book id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+      security:
+      - BearerAuth: []
+      summary: Get specific books
+      tags:
+      - books
   /deposits:
     post:
       consumes:
@@ -166,6 +331,30 @@ paths:
       tags:
       - deposits
   /payments:
+    get:
+      consumes:
+      - application/json
+      description: List of payment
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+      security:
+      - BearerAuth: []
+      summary: List of payment
+      tags:
+      - payments
     post:
       consumes:
       - application/json
@@ -197,6 +386,107 @@ paths:
       summary: Refresh payment status
       tags:
       - payments
+  /rental:
+    post:
+      consumes:
+      - application/json
+      description: Get active rental of logged in user
+      parameters:
+      - description: rental request
+        in: body
+        name: rental
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RentalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/entity.HttpResp'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Rental'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+      security:
+      - BearerAuth: []
+      summary: Create a rental
+      tags:
+      - rentals
+  /rental/active:
+    get:
+      consumes:
+      - application/json
+      description: Get active rental of logged in user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/entity.HttpResp'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/entity.Rental'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+      security:
+      - BearerAuth: []
+      summary: Get active rental
+      tags:
+      - rentals
+  /rental/closed:
+    get:
+      consumes:
+      - application/json
+      description: Get closed rental of logged in user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/entity.HttpResp'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/entity.Rental'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+      security:
+      - BearerAuth: []
+      summary: Get closed rental
+      tags:
+      - rentals
   /users:
     get:
       consumes:

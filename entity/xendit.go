@@ -8,11 +8,21 @@ import (
 
 var (
 	IdrCurrency = "IDR"
+
+	DescriptionDepositSaldo  = "Deposit Saldo"
+	DescriptionRentalPayment = "Rental Payment"
+
+	InvoiceExpiry = "86400"
 )
 
 const (
 	InvoiceStatusPending = "PENDING"
 	InvoiceStatusPaid    = "PAID"
+
+	PaymentMethodWaiting = "WAITING"
+
+	PaymentTypeDepositSaldo  = "deposit-saldo"
+	PaymentTypeRentalPayment = "rental-payment"
 )
 
 type XenditPaymentRequest struct {

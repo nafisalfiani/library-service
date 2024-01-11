@@ -11,6 +11,7 @@ type payment struct {
 }
 
 type PaymentInterface interface {
+	List(userId int) ([]entity.Payment, error)
 	Get(payment entity.Payment) (entity.Payment, error)
 	Create(payment entity.Payment) (entity.Payment, error)
 	Update(payment entity.Payment) (entity.Payment, error)
@@ -21,6 +22,15 @@ func initPayment(db *gorm.DB) PaymentInterface {
 	return &payment{
 		db: db,
 	}
+}
+
+func (p *payment) List(userId int) ([]entity.Payment, error) {
+	payments := []entity.Payment{}
+	if err := p.db.Find(&payments, p.db.Where("user_id = ?", userId)).Error; err != nil {
+		return payments, errorAlias(err)
+	}
+
+	return payments, nil
 }
 
 func (p *payment) Get(payment entity.Payment) (entity.Payment, error) {

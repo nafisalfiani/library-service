@@ -15,3 +15,11 @@ type Book struct {
 	RentalCost        float64        `json:"rental_cost" gorm:"not null"`
 	RentalDetails     []RentalDetail `json:"rental_details,omitempty" gorm:"foreignKey:BookId"`
 }
+
+type BookRequest struct {
+	Name              string  `json:"name" validate:"required"`
+	Description       string  `json:"description" validate:"required"`
+	StockAvailability int     `json:"stock_availability" validate:"required"`
+	CategoryName      string  `json:"category_name" validate:"required"`
+	RentalCost        float64 `json:"rental_cost" validate:"required"`
+}
