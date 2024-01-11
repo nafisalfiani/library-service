@@ -4,6 +4,7 @@ import (
 	"library/errors"
 
 	"github.com/xendit/xendit-go/v4"
+	"gopkg.in/gomail.v2"
 	"gorm.io/gorm"
 )
 
@@ -14,9 +15,10 @@ type Repository struct {
 	Rental   RentalInterface
 	Payment  PaymentInterface
 	Xendit   XenditInterface
+	Mail     MailInterface
 }
 
-func InitRepository(db *gorm.DB, xnd *xendit.APIClient) *Repository {
+func InitRepository(db *gorm.DB, xnd *xendit.APIClient, dialer *gomail.Dialer) *Repository {
 	return &Repository{
 		User:     initUser(db),
 		Book:     initBook(db),
@@ -24,6 +26,7 @@ func InitRepository(db *gorm.DB, xnd *xendit.APIClient) *Repository {
 		Rental:   initRental(db),
 		Payment:  initPayment(db),
 		Xendit:   initXendit(xnd),
+		Mail:     initMail(dialer),
 	}
 }
 

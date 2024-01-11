@@ -118,7 +118,7 @@ func (h *Handler) CreateBook(c echo.Context) error {
 // @Success 200 {object} entity.HttpResp
 // @Failure 400 {object} entity.HttpResp
 // @Failure 500 {object} entity.HttpResp
-// @Router /books [get]
+// @Router /books/{id} [put]
 func (h *Handler) UpdateBook(c echo.Context) error {
 	req := entity.BookRequest{}
 	if err := c.Bind(&req); err != nil {
@@ -173,7 +173,7 @@ func (h *Handler) UpdateBook(c echo.Context) error {
 // @Success 200 {object} entity.HttpResp
 // @Failure 400 {object} entity.HttpResp
 // @Failure 500 {object} entity.HttpResp
-// @Router /books [get]
+// @Router /books/{id} [delete]
 func (h *Handler) DeleteBook(c echo.Context) error {
 	bookIdStr := c.Param("id")
 	bookId, err := strconv.Atoi(bookIdStr)

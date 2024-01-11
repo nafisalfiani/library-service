@@ -13,6 +13,7 @@ type Value struct {
 	Log      Log
 	Server   Server
 	Xendit   Xendit
+	Mailer   Mailer
 }
 
 type Database struct {
@@ -42,6 +43,13 @@ type Xendit struct {
 	WebhookToken string
 }
 
+type Mailer struct {
+	MailerHost     string
+	MailerPort     int
+	MailerUser     string
+	MailerPassword string
+}
+
 func InitEnv() (*Value, error) {
 	err := godotenv.Load()
 	if err != nil {
@@ -49,6 +57,11 @@ func InitEnv() (*Value, error) {
 	}
 
 	port, err := strconv.Atoi(os.Getenv("SERVER_PORT"))
+	if err != nil {
+		return nil, err
+	}
+
+	mailerPort, err := strconv.Atoi(os.Getenv("MAILER_PORT"))
 	if err != nil {
 		return nil, err
 	}
@@ -75,6 +88,12 @@ func InitEnv() (*Value, error) {
 			ApiKey:       os.Getenv("XENDIT_API_KEY"),
 			PublicKey:    os.Getenv("XENDIT_PUBLIC_KEY"),
 			WebhookToken: os.Getenv("XENDIT_WEBHOOK_TOKEN"),
+		},
+		Mailer: Mailer{
+			MailerHost:     os.Getenv("MAILER_HOST"),
+			MailerPort:     mailerPort,
+			MailerUser:     os.Getenv("MAILER_USER"),
+			MailerPassword: os.Getenv("MAILER_PASSWORD"),
 		},
 	}, nil
 }

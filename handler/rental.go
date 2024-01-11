@@ -133,5 +133,19 @@ func (h *Handler) CreateRental(c echo.Context) error {
 	}
 	h.logger.Debug(fmt.Sprintf("%v", newPayment))
 
+	mail := entity.Mail{
+		From:    "library-service@mail.com",
+		To:      user.Email,
+		Subject: "Library Rental Payment",
+	}
+	mail.Body, err = mail.ParseHtml(resp)
+	if err != nil {
+		h.logger.Error(fmt.Sprintf("failed to parse template with error: %v", err))
+	} else {
+		if err := h.mailer.Send(mail); err != nil {
+			h.logger.Error(fmt.Sprintf("email not sent with error: %v", err))
+		}
+	}
+
 	return h.httpSuccess(c, http.StatusCreated, resp)
 }

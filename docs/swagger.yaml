@@ -209,20 +209,21 @@ paths:
     get:
       consumes:
       - application/json
-      description: Delete specific books
-      parameters:
-      - description: book id
-        in: path
-        name: id
-        required: true
-        type: string
+      description: returns list of books
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.HttpResp'
+            allOf:
+            - $ref: '#/definitions/entity.HttpResp'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/entity.Book'
+                  type: array
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -233,7 +234,7 @@ paths:
             $ref: '#/definitions/entity.HttpResp'
       security:
       - BearerAuth: []
-      summary: Delete book
+      summary: List books
       tags:
       - books
     post:
@@ -268,6 +269,36 @@ paths:
       tags:
       - books
   /books/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete specific books
+      parameters:
+      - description: book id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+      security:
+      - BearerAuth: []
+      summary: Delete book
+      tags:
+      - books
     get:
       consumes:
       - application/json
@@ -296,6 +327,42 @@ paths:
       security:
       - BearerAuth: []
       summary: Get specific books
+      tags:
+      - books
+    put:
+      consumes:
+      - application/json
+      description: Updates specific book
+      parameters:
+      - description: book id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: book request
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/entity.BookRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+      security:
+      - BearerAuth: []
+      summary: Update book
       tags:
       - books
   /deposits:

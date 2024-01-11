@@ -14,6 +14,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"github.com/xendit/xendit-go/v4"
+	"gopkg.in/gomail.v2"
 )
 
 // @contact.name Nafisa Alfiani
@@ -59,8 +60,11 @@ func main() {
 	// init xendit
 	xnd := xendit.NewClient(cfg.Xendit.ApiKey)
 
+	// init mailer
+	mailer := gomail.NewDialer(cfg.Mailer.MailerHost, cfg.Mailer.MailerPort, cfg.Mailer.MailerUser, cfg.Mailer.MailerPassword)
+
 	// init repository
-	repo := repository.InitRepository(db, xnd)
+	repo := repository.InitRepository(db, xnd, mailer)
 
 	// init handler
 	handler := handler.Init(cfg, repo, validator, logger)

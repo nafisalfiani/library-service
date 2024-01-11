@@ -29,6 +29,7 @@ type Handler struct {
 	payment   repository.PaymentInterface
 	rental    repository.RentalInterface
 	xendit    repository.XenditInterface
+	mailer    repository.MailInterface
 }
 
 // Init create new Handler object
@@ -43,6 +44,7 @@ func Init(config *config.Value, repo *repository.Repository, validator *validato
 		payment:   repo.Payment,
 		rental:    repo.Rental,
 		xendit:    repo.Xendit,
+		mailer:    repo.Mail,
 	}
 }
 
