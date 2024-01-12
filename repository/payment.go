@@ -63,7 +63,7 @@ func (p *payment) Update(payment entity.Payment) (entity.Payment, error) {
 			return err
 		}
 
-		if payment.Type == entity.PaymentTypeDepositSaldo {
+		if payment.Type == entity.PaymentTypeDepositSaldo && payment.ShouldUpdateDeposit {
 			user.DepositAmount = user.DepositAmount + payment.Amount
 		}
 		if err := tx.Save(&user).Error; err != nil {
