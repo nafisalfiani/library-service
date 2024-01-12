@@ -78,7 +78,7 @@ func (h *Handler) GetBook(c echo.Context) error {
 func (h *Handler) CreateBook(c echo.Context) error {
 	role := c.Request().Context().Value(contextKeyUserRole).(string)
 	if role != "admin" {
-		return h.httpError(c, errors.ErrUnauthorized)
+		return h.httpError(c, errors.ErrUnauthorized, "you don't have access")
 	}
 
 	req := entity.BookRequest{}
@@ -141,7 +141,7 @@ func (h *Handler) createBook(req entity.BookRequest) (entity.Book, error) {
 func (h *Handler) UpdateBook(c echo.Context) error {
 	role := c.Request().Context().Value(contextKeyUserRole).(string)
 	if role != "admin" {
-		return h.httpError(c, errors.ErrUnauthorized)
+		return h.httpError(c, errors.ErrUnauthorized, "you don't have access")
 	}
 
 	req := entity.BookRequest{}
@@ -201,7 +201,7 @@ func (h *Handler) UpdateBook(c echo.Context) error {
 func (h *Handler) DeleteBook(c echo.Context) error {
 	role := c.Request().Context().Value(contextKeyUserRole).(string)
 	if role != "admin" {
-		return h.httpError(c, errors.ErrUnauthorized)
+		return h.httpError(c, errors.ErrUnauthorized, "you don't have access")
 	}
 
 	bookIdStr := c.Param("id")

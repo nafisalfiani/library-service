@@ -43,7 +43,7 @@ func (h *Handler) RefreshPaymentStatus(c echo.Context) error {
 
 	// only update the payment info if invoice status is not pending
 	if resp.InvoiceStatus != entity.InvoiceStatusPending {
-		_, paymentId, err := resp.GetPaymentId()
+		paymentType, paymentId, err := resp.GetPaymentId()
 		if err != nil {
 			return h.httpError(c, err)
 		}
@@ -54,6 +54,10 @@ func (h *Handler) RefreshPaymentStatus(c echo.Context) error {
 
 		payment.Status = entity.InvoiceStatusPaid
 		payment.PaymentMethod = resp.PaymentMethod
+		payment.Type = paymentType
+		if paymentType == entity.PaymentTypeDepositSaldo {
+			payment.ShouldUpdateDeposit = true
+		}
 		newPayment, err := h.payment.Update(payment)
 		if err != nil {
 			return h.httpError(c, err)
@@ -77,7 +81,7 @@ func (h *Handler) RefreshPaymentStatus(c echo.Context) error {
 // @Success 200 {object} entity.HttpResp
 // @Failure 400 {object} entity.HttpResp
 // @Failure 500 {object} entity.HttpResp
-// @Router /payments [post]
+// @Router /webhooks/payment [post]
 func (h *Handler) UpdatePaymentStatus(c echo.Context) error {
 	req := entity.XenditWebhookBody{}
 	if err := c.Bind(&req); err != nil {
@@ -103,7 +107,6 @@ func (h *Handler) UpdatePaymentStatus(c echo.Context) error {
 	if paymentType == entity.PaymentTypeDepositSaldo {
 		payment.ShouldUpdateDeposit = true
 	}
-
 	newPayment, err := h.payment.Update(payment)
 	if err != nil {
 		return h.httpError(c, err)

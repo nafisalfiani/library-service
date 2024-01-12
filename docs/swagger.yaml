@@ -654,6 +654,38 @@ paths:
       summary: Register new user
       tags:
       - users
+  /webhooks/payment:
+    post:
+      consumes:
+      - application/json
+      description: Check and refresh payment status if applicable
+      parameters:
+      - description: payment request
+        in: body
+        name: payment
+        required: true
+        schema:
+          $ref: '#/definitions/entity.XenditCheckPayment'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.HttpResp'
+      security:
+      - BearerAuth: []
+      summary: Refresh payment status
+      tags:
+      - payments
 securityDefinitions:
   BearerAuth:
     in: header
