@@ -10,6 +10,7 @@ type mail struct {
 	dialer *gomail.Dialer
 }
 
+//go:generate mockery --name Mail
 type MailInterface interface {
 	Send(header entity.Mail) error
 }

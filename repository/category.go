@@ -10,6 +10,7 @@ type category struct {
 	db *gorm.DB
 }
 
+//go:generate mockery --name Category
 type CategoryInterface interface {
 	Get(category entity.Category) (entity.Category, error)
 	Create(category entity.Category) (entity.Category, error)

@@ -11,6 +11,7 @@ type rental struct {
 	db *gorm.DB
 }
 
+//go:generate mockery --name Rental
 type RentalInterface interface {
 	ListOutstanding() ([]entity.Rental, error)
 	ListHistory() ([]entity.Rental, error)

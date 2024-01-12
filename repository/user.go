@@ -10,6 +10,7 @@ type user struct {
 	db *gorm.DB
 }
 
+//go:generate mockery --name User
 type UserInterface interface {
 	List() ([]entity.User, error)
 	Get(username string) (entity.User, error)

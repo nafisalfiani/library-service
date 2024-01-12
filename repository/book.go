@@ -10,6 +10,7 @@ type book struct {
 	db *gorm.DB
 }
 
+//go:generate mockery --name Book
 type BookInterface interface {
 	List() ([]entity.Book, error)
 	Get(book entity.Book) (entity.Book, error)

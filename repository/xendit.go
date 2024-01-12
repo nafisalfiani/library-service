@@ -13,6 +13,7 @@ type xndClient struct {
 	xnd *xendit.APIClient
 }
 
+//go:generate mockery --name Xendit
 type XenditInterface interface {
 	CreatePayment(ctx context.Context, payment entity.XenditPaymentRequest) (entity.XenditPaymentResponse, error)
 	CheckPayment(ctx context.Context, payment entity.XenditPaymentResponse) (entity.XenditPaymentResponse, error)

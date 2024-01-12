@@ -62,7 +62,46 @@ func (h *Handler) RefreshPaymentStatus(c echo.Context) error {
 		h.logger.Debug(fmt.Sprintf("%#v", newPayment))
 	}
 
-	return h.httpSuccess(c, http.StatusCreated, resp)
+	return h.httpSuccess(c, http.StatusOK, resp)
+}
+
+// UpdatePaymentStatus check and refresh payment status if applicable
+//
+// @Summary Refresh payment status
+// @Description Check and refresh payment status if applicable
+// @Tags payments
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param payment body entity.XenditCheckPayment true "payment request"
+// @Success 200 {object} entity.HttpResp
+// @Failure 400 {object} entity.HttpResp
+// @Failure 500 {object} entity.HttpResp
+// @Router /payments [post]
+func (h *Handler) UpdatePaymentStatus(c echo.Context) error {
+	req := entity.XenditWebhookBody{}
+	if err := c.Bind(&req); err != nil {
+		return h.httpError(c, errors.ErrBadRequest, err.Error())
+	}
+
+	_, paymentId, err := req.GetPaymentId()
+	if err != nil {
+		return h.httpError(c, errors.ErrBadRequest, err.Error())
+	}
+
+	payment, err := h.payment.Get(entity.Payment{Id: paymentId})
+	if err != nil {
+		return h.httpError(c, err)
+	}
+
+	payment.Status = entity.InvoiceStatusPaid
+	payment.PaymentMethod = req.PaymentMethod
+	newPayment, err := h.payment.Update(payment)
+	if err != nil {
+		return h.httpError(c, err)
+	}
+
+	return h.httpSuccess(c, http.StatusOK, newPayment)
 }
 
 // GetPayments returns list of payment

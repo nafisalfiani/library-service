@@ -10,6 +10,7 @@ type payment struct {
 	db *gorm.DB
 }
 
+//go:generate mockery --name Payment
 type PaymentInterface interface {
 	List(userId int) ([]entity.Payment, error)
 	Get(payment entity.Payment) (entity.Payment, error)

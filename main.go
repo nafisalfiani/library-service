@@ -97,6 +97,9 @@ func main() {
 	payments.GET("", handler.GetPayments)
 	payments.POST("", handler.RefreshPaymentStatus)
 
+	webhook := e.Group("/webhooks")
+	webhook.POST("/payment", handler.UpdatePaymentStatus)
+
 	books := e.Group("/books", handler.Authorize)
 	books.GET("", handler.ListBook)
 	books.GET("/:id", handler.GetBook)
