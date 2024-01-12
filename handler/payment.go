@@ -84,7 +84,10 @@ func (h *Handler) UpdatePaymentStatus(c echo.Context) error {
 		return h.httpError(c, errors.ErrBadRequest, err.Error())
 	}
 
-	_, paymentId, err := req.GetPaymentId()
+	fmt.Println(c.Request().Header.Get("x-callback-token"))
+	fmt.Println(c.Request().Header.Get("webhook-id"))
+
+	paymentType, paymentId, err := req.GetPaymentId()
 	if err != nil {
 		return h.httpError(c, errors.ErrBadRequest, err.Error())
 	}
@@ -94,8 +97,9 @@ func (h *Handler) UpdatePaymentStatus(c echo.Context) error {
 		return h.httpError(c, err)
 	}
 
-	payment.Status = entity.InvoiceStatusPaid
+	payment.Status = req.Status
 	payment.PaymentMethod = req.PaymentMethod
+	payment.Type = paymentType
 	newPayment, err := h.payment.Update(payment)
 	if err != nil {
 		return h.httpError(c, err)

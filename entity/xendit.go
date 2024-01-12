@@ -89,6 +89,7 @@ type XenditWebhookBody struct {
 }
 
 func (x *XenditWebhookBody) GetPaymentId() (paymentType string, paymentId int, err error) {
+	// xendit eternal id format is -> library-service:<payment_type>:<payment_id>
 	res := strings.Split(x.ExternalID, ":")
 	paymentType = res[1]
 	paymentId, err = strconv.Atoi(res[2])
