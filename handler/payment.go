@@ -100,6 +100,10 @@ func (h *Handler) UpdatePaymentStatus(c echo.Context) error {
 	payment.Status = req.Status
 	payment.PaymentMethod = req.PaymentMethod
 	payment.Type = paymentType
+	if paymentType == entity.PaymentTypeDepositSaldo {
+		payment.ShouldUpdateDeposit = true
+	}
+
 	newPayment, err := h.payment.Update(payment)
 	if err != nil {
 		return h.httpError(c, err)

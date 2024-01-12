@@ -22,12 +22,16 @@ import (
 // @Failure 500 {object} entity.HttpResp
 // @Router /books [get]
 func (h *Handler) ListBook(c echo.Context) error {
-	books, err := h.book.List()
+	books, err := h.listBook()
 	if err != nil {
 		return h.httpError(c, err)
 	}
 
 	return h.httpSuccess(c, http.StatusOK, books)
+}
+
+func (h *Handler) listBook() ([]entity.Book, error) {
+	return h.book.List()
 }
 
 // GetBook returns specific books
@@ -72,26 +76,41 @@ func (h *Handler) GetBook(c echo.Context) error {
 // @Failure 500 {object} entity.HttpResp
 // @Router /books [post]
 func (h *Handler) CreateBook(c echo.Context) error {
+	role := c.Request().Context().Value(contextKeyUserRole).(string)
+	if role != "admin" {
+		return h.httpError(c, errors.ErrUnauthorized)
+	}
+
 	req := entity.BookRequest{}
 	if err := c.Bind(&req); err != nil {
 		return h.httpError(c, errors.ErrBadRequest, err.Error())
 	}
 
+	book, err := h.createBook(req)
+	if err != nil {
+		return h.httpError(c, err)
+	}
+
+	return h.httpSuccess(c, http.StatusCreated, book)
+}
+
+func (h *Handler) createBook(req entity.BookRequest) (entity.Book, error) {
+	var book entity.Book
 	if err := h.validator.Struct(req); err != nil {
-		return h.httpError(c, errors.ErrBadRequest, err.Error())
+		return book, err
 	}
 
 	category, err := h.category.Get(entity.Category{Name: req.CategoryName})
 	if errors.Is(err, errors.ErrNotFound) {
 		category, err = h.category.Create(entity.Category{Name: req.CategoryName})
 		if err != nil {
-			return h.httpError(c, err)
+			return book, err
 		}
 	} else if err != nil {
-		return h.httpError(c, err)
+		return book, err
 	}
 
-	book, err := h.book.Create(entity.Book{
+	newBook, err := h.book.Create(entity.Book{
 		Name:              req.Name,
 		Description:       req.Description,
 		StockAvailability: req.StockAvailability,
@@ -99,10 +118,10 @@ func (h *Handler) CreateBook(c echo.Context) error {
 		RentalCost:        req.RentalCost,
 	})
 	if err != nil {
-		return h.httpError(c, err)
+		return book, err
 	}
 
-	return h.httpSuccess(c, http.StatusCreated, book)
+	return newBook, nil
 }
 
 // UpdateBook updates specific book
@@ -120,6 +139,11 @@ func (h *Handler) CreateBook(c echo.Context) error {
 // @Failure 500 {object} entity.HttpResp
 // @Router /books/{id} [put]
 func (h *Handler) UpdateBook(c echo.Context) error {
+	role := c.Request().Context().Value(contextKeyUserRole).(string)
+	if role != "admin" {
+		return h.httpError(c, errors.ErrUnauthorized)
+	}
+
 	req := entity.BookRequest{}
 	if err := c.Bind(&req); err != nil {
 		return h.httpError(c, errors.ErrBadRequest, err.Error())
@@ -175,15 +199,28 @@ func (h *Handler) UpdateBook(c echo.Context) error {
 // @Failure 500 {object} entity.HttpResp
 // @Router /books/{id} [delete]
 func (h *Handler) DeleteBook(c echo.Context) error {
+	role := c.Request().Context().Value(contextKeyUserRole).(string)
+	if role != "admin" {
+		return h.httpError(c, errors.ErrUnauthorized)
+	}
+
 	bookIdStr := c.Param("id")
 	bookId, err := strconv.Atoi(bookIdStr)
 	if err != nil {
 		return h.httpError(c, errors.ErrBadRequest, err.Error())
 	}
 
-	if err := h.book.Delete(bookId); err != nil {
+	if err := h.deleteBook(bookId); err != nil {
 		return h.httpError(c, err)
 	}
 
 	return h.httpSuccess(c, http.StatusOK, nil)
+}
+
+func (h *Handler) deleteBook(bookId int) error {
+	if err := h.book.Delete(bookId); err != nil {
+		return err
+	}
+
+	return nil
 }

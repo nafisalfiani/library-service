@@ -51,6 +51,28 @@ func (h *Handler) TopUpDeposit(c echo.Context) error {
 		return h.httpError(c, err)
 	}
 
+	depositReq.XenditPaymentId = resp.XenditPaymentId
+	depositReq.XenditPaymentUrl = resp.InvoiceUrl
+	newPayment, err := h.payment.Update(depositReq)
+	if err != nil {
+		return h.httpError(c, err)
+	}
+	h.logger.Debug(fmt.Sprintf("%#v", newPayment))
+
+	mail := entity.Mail{
+		From:    "library-service@mail.com",
+		To:      user.Email,
+		Subject: "Library Deposit Saldo",
+	}
+	mail.Body, err = mail.ParseHtml(resp)
+	if err != nil {
+		h.logger.Error(fmt.Sprintf("failed to parse template with error: %v", err))
+	} else {
+		if err := h.mailer.Send(mail); err != nil {
+			h.logger.Error(fmt.Sprintf("email not sent with error: %v", err))
+		}
+	}
+
 	return h.httpSuccess(c, http.StatusCreated, resp)
 }
 
@@ -80,20 +102,6 @@ func (h *Handler) createPayment(ctx context.Context, req entity.Payment, user en
 	resp, err := h.xendit.CreatePayment(ctx, paymentReq)
 	if err != nil {
 		return resp, err
-	}
-
-	mail := entity.Mail{
-		From:    "library-service@mail.com",
-		To:      user.Email,
-		Subject: "Library Deposit Saldo",
-	}
-	mail.Body, err = mail.ParseHtml(resp)
-	if err != nil {
-		h.logger.Error(fmt.Sprintf("failed to parse template with error: %v", err))
-	} else {
-		if err := h.mailer.Send(mail); err != nil {
-			h.logger.Error(fmt.Sprintf("email not sent with error: %v", err))
-		}
 	}
 
 	return resp, nil
