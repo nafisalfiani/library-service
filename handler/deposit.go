@@ -51,6 +51,12 @@ func (h *Handler) TopUpDeposit(c echo.Context) error {
 		return h.httpError(c, err)
 	}
 
+	_, paymentId, err := resp.GetPaymentId()
+	if err != nil {
+		return h.httpError(c, err)
+	}
+
+	depositReq.Id = paymentId
 	depositReq.XenditPaymentId = resp.XenditPaymentId
 	depositReq.XenditPaymentUrl = resp.InvoiceUrl
 	newPayment, err := h.payment.Update(depositReq)
